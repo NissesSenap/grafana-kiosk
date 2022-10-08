@@ -1,8 +1,13 @@
 package kiosk
 
 import (
+	"crypto/tls"
 	"log"
+	"net/http"
 	"net/url"
+	"path"
+
+	grapi "github.com/grafana/grafana-api-golang-client"
 )
 
 // GenerateURL constructs URL with appropriate parameters for kiosk mode
@@ -33,3 +38,58 @@ func GenerateURL(anURL string, kioskMode string, autoFit bool, isPlayList bool) 
 	}
 	return u.String()
 }
+
+func NewGrafanaClient(anURL, username, password string, ignoreCertErrors bool) (*grapi.Client, error) {
+	userinfo := url.UserPassword(username, password)
+	clientConfig := grapi.Config{
+		APIKey:    "",
+		BasicAuth: userinfo,
+		Client: &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: ignoreCertErrors,
+				},
+			},
+		},
+		OrgID:      0,
+		NumRetries: 0,
+	}
+
+	u, err := url.Parse(anURL)
+	if err != nil {
+		return nil, err
+	}
+	u.Path = ""
+	u.RawQuery = ""
+	u.Fragment = ""
+
+	grafanaClient, err := grapi.New(u.String(), clientConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return grafanaClient, nil
+}
+
+// getPlayListUID, get the UID of a playlist from an id
+func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
+	id, err := url.Parse(anURL)
+	if err != nil {
+		return "", err
+	}
+
+	platList, err := client.Playlist(path.Base(id.Path))
+	if err != nil {
+		return "", err
+	}
+	return platList.UID, nil
+}
+
+/*
+func ChangeIDtoUID(anURL, uid string) {
+	urlA, _ := url.Parse(anURL)
+	urlPATH := urlA.Path
+	// TODO grab the output and change the last value.
+	Some split
+}
+*/

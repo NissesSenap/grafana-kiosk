@@ -50,7 +50,23 @@ func GrafanaKioskLocal(cfg *Config) {
 		panic(err)
 	}
 
-	var generatedURL = GenerateURL(cfg.Target.URL, cfg.General.Mode, cfg.General.AutoFit, cfg.Target.IsPlayList)
+	anURL := cfg.Target.URL
+	if cfg.Target.IsPlayList {
+		client, err := NewGrafanaClient(anURL, cfg.Target.Username, cfg.Target.Password, cfg.Target.IgnoreCertificateErrors)
+		if err != nil {
+			log.Println("unable to create grafana Client")
+			panic(err)
+		}
+		uid, err := GetPlayListUID(anURL, client)
+		if err != nil {
+			log.Println("Unable to get the uid from the id defined")
+			panic(err)
+		}
+		//TODO create a function that readds a uid
+		anURL = uid
+
+	}
+	var generatedURL = GenerateURL(anURL, cfg.General.Mode, cfg.General.AutoFit, cfg.Target.IsPlayList)
 	log.Println("Navigating to ", generatedURL)
 	/*
 		Launch chrome and login with local user account
