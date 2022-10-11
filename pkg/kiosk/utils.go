@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 
 	grapi "github.com/grafana/grafana-api-golang-client"
 )
@@ -85,11 +86,33 @@ func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
 	return platList.UID, nil
 }
 
-/*
-func ChangeIDtoUID(anURL, uid string) {
-	urlA, _ := url.Parse(anURL)
+func ChangeIDtoUID(anURL, uid string) (string, error) {
+	urlA, err := url.Parse(anURL)
+	if err != nil {
+		return "", err
+	}
 	urlPATH := urlA.Path
-	// TODO grab the output and change the last value.
-	Some split
+
+	// Make the url path in to a list
+	urlPATH = strings.TrimSpace(urlPATH)
+	//Cut off the leading and trailing forward slashes, if they exist.
+	//This cuts off the leading forward slash.
+	urlPATH = strings.TrimPrefix(urlPATH, "/")
+
+	//This cuts off the trailing forward slash.
+	if strings.HasSuffix(urlPATH, "/") {
+		cut_off_last_char_len := len(urlPATH) - 1
+		urlPATH = urlPATH[:cut_off_last_char_len]
+	}
+	//We need to isolate the individual components of the path.
+	splitURLpath := strings.Split(urlPATH, "/")
+	// delete the last item in the list
+	splitURLpath = splitURLpath[:len(splitURLpath)-1]
+	splitURLpath = append(splitURLpath, uid)
+
+	// make in to string again
+	fixedURL := strings.Join(splitURLpath, "/")
+	// make a full URL again
+	fixedURL = urlA.Scheme + "://" + urlA.Host + "/" + fixedURL
+	return fixedURL, nil
 }
-*/
