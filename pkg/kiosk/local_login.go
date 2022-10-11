@@ -62,9 +62,14 @@ func GrafanaKioskLocal(cfg *Config) {
 			log.Println("Unable to get the uid from the id defined")
 			panic(err)
 		}
-		//TODO create a function that readds a uid
-		anURL = uid
 
+		// replace the id with uid
+		err = nil
+		anURL, err = ChangeIDtoUID(anURL, uid)
+		if err != nil {
+			panic(err)
+		}
+		log.Println("The uid URL is ", anURL)
 	}
 	var generatedURL = GenerateURL(anURL, cfg.General.Mode, cfg.General.AutoFit, cfg.Target.IsPlayList)
 	log.Println("Navigating to ", generatedURL)
