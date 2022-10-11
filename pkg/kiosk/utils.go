@@ -64,6 +64,7 @@ func NewGrafanaClient(anURL, username, password string, ignoreCertErrors bool) (
 	u.RawQuery = ""
 	u.Fragment = ""
 
+	log.Println("this is the baseURL", u.String())
 	grafanaClient, err := grapi.New(u.String(), clientConfig)
 	if err != nil {
 		return nil, err
