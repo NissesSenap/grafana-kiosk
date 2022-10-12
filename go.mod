@@ -11,4 +11,4 @@ require (
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
 )
 
-replace github.com/grafana/grafana-api-golang-client v0.12.0 => github.com/nissessenap/grafana-api-golang-client v0.0.0-20221012070530-758403955a6c
+replace github.com/grafana/grafana-api-golang-client v0.12.0 => github.com/nissessenap/grafana-api-golang-client v0.0.0-20221012135911-271ce27883ab

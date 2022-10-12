@@ -65,6 +65,7 @@ func GrafanaKioskLocal(cfg *Config) {
 
 		// replace the id with uid
 		err = nil
+		log.Printf("this is the uid %s", uid)
 		anURL, err = ChangeIDtoUID(anURL, uid)
 		if err != nil {
 			panic(err)

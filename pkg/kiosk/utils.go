@@ -2,10 +2,12 @@ package kiosk
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 
 	grapi "github.com/grafana/grafana-api-golang-client"
@@ -75,18 +77,38 @@ func NewGrafanaClient(anURL, username, password string, ignoreCertErrors bool) (
 
 // getPlayListUID, get the UID of a playlist from an id
 func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
-	id, err := url.Parse(anURL)
+	idURL, err := url.Parse(anURL)
+	if err != nil {
+		return "", err
+	}
+	id := path.Base(idURL.Path)
+
+	log.Println("This is the id", id)
+	playLists, err := client.Playlists(url.Values{})
 	if err != nil {
 		return "", err
 	}
 
-	log.Println("This is the id", path.Base(id.Path))
-
-	platList, err := client.Playlist(path.Base(id.Path))
+	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return "", err
 	}
-	return platList.UID, nil
+
+	playList := &grapi.Playlist{}
+	for _, avaliablePlayList := range *playLists {
+		log.Printf("this is the playlist %v", avaliablePlayList)
+		if avaliablePlayList.ID == intID {
+			playList, err = client.Playlist(avaliablePlayList.UID)
+			if err != nil {
+				return "", err
+			}
+			break
+		}
+	}
+	// TODO what to return if it's not a hit
+
+	fmt.Println("This is playList UID", playList.UID)
+	return playList.UID, nil
 }
 
 func ChangeIDtoUID(anURL, uid string) (string, error) {
