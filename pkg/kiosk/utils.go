@@ -80,6 +80,8 @@ func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
 		return "", err
 	}
 
+	log.Println("This is the id", path.Base(id.Path))
+
 	platList, err := client.Playlist(path.Base(id.Path))
 	if err != nil {
 		return "", err
