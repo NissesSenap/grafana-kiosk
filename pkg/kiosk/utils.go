@@ -2,7 +2,6 @@ package kiosk
 
 import (
 	"crypto/tls"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -66,7 +65,6 @@ func NewGrafanaClient(anURL, username, password string, ignoreCertErrors bool) (
 	u.RawQuery = ""
 	u.Fragment = ""
 
-	log.Println("this is the baseURL", u.String())
 	grafanaClient, err := grapi.New(u.String(), clientConfig)
 	if err != nil {
 		return nil, err
@@ -83,7 +81,7 @@ func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
 	}
 	id := path.Base(idURL.Path)
 
-	log.Println("This is the id", id)
+	log.Println("Playlist ID:", id)
 	playLists, err := client.Playlists(url.Values{})
 	if err != nil {
 		return "", err
@@ -96,7 +94,6 @@ func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
 
 	playList := &grapi.Playlist{}
 	for _, avaliablePlayList := range *playLists {
-		log.Printf("this is the playlist %v", avaliablePlayList)
 		if avaliablePlayList.ID == intID {
 			playList, err = client.Playlist(avaliablePlayList.UID)
 			if err != nil {
@@ -107,7 +104,6 @@ func GetPlayListUID(anURL string, client *grapi.Client) (string, error) {
 	}
 	// TODO what to return if it's not a hit
 
-	fmt.Println("This is playList UID", playList.UID)
 	return playList.UID, nil
 }
 
