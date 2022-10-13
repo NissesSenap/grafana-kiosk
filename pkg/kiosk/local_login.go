@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"time"
 
@@ -95,11 +96,19 @@ func gatherPlayListUID(anURL, username, password string, ignoreCertErrors bool) 
 	log.Printf("Playlist uid: %s", uid)
 
 	// replace the id with uid
-	err = nil
-	anURL, err = ChangeIDtoUID(anURL, uid)
+	urlOfAnURL, err := url.Parse(anURL)
 	if err != nil {
 		return "", err
 	}
-	log.Println("URL using uid:", anURL)
-	return anURL, nil
+	uidURL := UrlChangeIDtoUID(urlOfAnURL, uid)
+
+	/*
+		err = nil
+		anURL, err = ChangeIDtoUID(anURL, uid)
+		if err != nil {
+			return "", err
+		}
+	*/
+	log.Println("URL using uid:", uidURL.String())
+	return uidURL.String(), nil
 }

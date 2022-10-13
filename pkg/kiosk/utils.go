@@ -137,3 +137,15 @@ func ChangeIDtoUID(anURL, uid string) (string, error) {
 	fixedURL = urlA.Scheme + "://" + urlA.Host + "/" + fixedURL
 	return fixedURL, nil
 }
+
+func UrlChangeIDtoUID(anURL *url.URL, uid string) *url.URL {
+	splitURLpath := strings.Split(anURL.Path, "/")
+	// delete the last item in the list
+	splitURLpath = splitURLpath[:len(splitURLpath)-1]
+	splitURLpath = append(splitURLpath, uid)
+	// make in to string again
+	fixedURL := strings.Join(splitURLpath, "/")
+	anURL.Path = fixedURL
+
+	return anURL
+}
